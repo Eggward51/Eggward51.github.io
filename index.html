@@ -1,9 +1,837 @@
-<!doctype html>
-<html>
-  <head>
-    <title>This is the title of the webpage!</title>
-  </head>
-  <body>
-    <p>This is an example paragraph. Anything in the <strong>body</strong> tag will appear on the page, just like this <strong>p</strong> tag and its contents.</p>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Name — Mechanical Engineer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Design tokens ─────────────────────────────────── */
+    :root {
+      --bg:        #0d0d0d;
+      --surface:   #141414;
+      --border:    #2a2a2a;
+      --accent:    #e8611a;
+      --accent2:   #f0a500;
+      --text:      #e8e4dc;
+      --muted:     #6b6560;
+      --font-head: 'Bebas Neue', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-body: 'IBM Plex Sans', sans-serif;
+    }
+
+    /* ── Reset & base ──────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── Noise texture overlay ─────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    /* ── Navigation ────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+    }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Hero ──────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 8rem 3rem 4rem;
+      gap: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg-text {
+      position: absolute;
+      bottom: -2rem; right: -1rem;
+      font-family: var(--font-head);
+      font-size: clamp(8rem, 18vw, 20rem);
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(232,97,26,0.08);
+      letter-spacing: -0.02em;
+      pointer-events: none;
+      line-height: 1;
+      user-select: none;
+    }
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
+    .hero-name {
+      font-family: var(--font-head);
+      font-size: clamp(3.5rem, 7vw, 7rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-name span { color: var(--accent); }
+    .hero-tagline {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 38ch;
+      margin-bottom: 2.5rem;
+      font-style: italic;
+    }
+    .hero-cta {
+      display: inline-flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .btn {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.75rem 1.8rem;
+      border: 1px solid;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+    .btn-primary:hover { background: #c94f12; border-color: #c94f12; }
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover { border-color: var(--text); }
+
+    /* Hero right: stats strip */
+    .hero-stats {
+      display: flex; flex-direction: column; gap: 2rem;
+      border-left: 1px solid var(--border);
+      padding-left: 3rem;
+    }
+    .stat-item {}
+    .stat-number {
+      font-family: var(--font-head);
+      font-size: 3.5rem;
+      color: var(--accent2);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+    .hero-availability {
+      margin-top: auto;
+      display: flex; align-items: center; gap: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #3ecf3e;
+      box-shadow: 0 0 6px #3ecf3e;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── Section base ──────────────────────────────────── */
+    section { padding: 7rem 3rem; }
+    .section-header {
+      display: flex; align-items: baseline; gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+    .section-num {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+    }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      letter-spacing: 0.04em;
+    }
+    .section-line {
+      flex: 1; height: 1px;
+      background: var(--border);
+      margin-bottom: 0.4rem;
+    }
+
+    /* ── About ─────────────────────────────────────────── */
+    #about { background: var(--surface); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .about-photo-frame {
+      aspect-ratio: 3/4;
+      background: var(--border);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .about-photo-frame::after {
+      content: 'YOUR PHOTO';
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+    }
+    /* Replace background + ::after with an <img> tag when ready */
+    .about-text h3 {
+      font-family: var(--font-head);
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent2);
+    }
+    .about-text p { color: var(--muted); margin-bottom: 1rem; }
+    .about-text p strong { color: var(--text); font-weight: 600; }
+    .detail-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.8rem 2rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .detail-item label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.2rem;
+    }
+    .detail-item span {
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    /* ── Skills ────────────────────────────────────────── */
+    #skills {}
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border);
+    }
+    .skill-category {
+      padding: 2rem;
+      border-right: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .skill-category:hover { background: var(--surface); }
+    .skill-category:last-child { border-right: none; }
+    .skill-cat-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+    .skill-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      margin: 0.25rem 0.2rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .skill-tag:hover { border-color: var(--accent); color: var(--text); }
+
+    /* ── Projects ──────────────────────────────────────── */
+    #projects { background: var(--surface); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .project-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s;
+      cursor: pointer;
+    }
+    .project-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+    .project-img {
+      aspect-ratio: 16/9;
+      background: var(--border);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .project-img-placeholder {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    /* Replace .project-img contents with an <img> tag for each project */
+    .project-tag {
+      position: absolute; top: 1rem; left: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 0.2rem 0.6rem;
+    }
+    .project-body { padding: 1.5rem; }
+    .project-title {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+    .project-desc { font-size: 0.875rem; color: var(--muted); margin-bottom: 1.2rem; }
+    .project-meta {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent2);
+    }
+
+    /* ── Experience ────────────────────────────────────── */
+    #experience {}
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: '';
+      position: absolute; left: 0; top: 0.6rem; bottom: 0;
+      width: 1px; background: var(--border);
+    }
+    .timeline-item { position: relative; margin-bottom: 3.5rem; }
+    .timeline-dot {
+      position: absolute; left: -2.4rem; top: 0.4rem;
+      width: 10px; height: 10px;
+      border: 1px solid var(--accent);
+      background: var(--bg);
+      transform: rotate(45deg);
+    }
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+    .timeline-role {
+      font-family: var(--font-head);
+      font-size: 1.6rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.2rem;
+    }
+    .timeline-company {
+      font-size: 0.9rem;
+      color: var(--accent2);
+      margin-bottom: 0.8rem;
+    }
+    .timeline-desc { font-size: 0.875rem; color: var(--muted); max-width: 65ch; }
+    .timeline-skills { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .timeline-skills .skill-tag { margin: 0; }
+
+    /* ── Education ─────────────────────────────────────── */
+    #education { background: var(--surface); }
+    .edu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .edu-card {
+      padding: 2rem;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .edu-card:hover { border-color: var(--accent2); }
+    .edu-year {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+    .edu-degree {
+      font-family: var(--font-head);
+      font-size: 1.4rem;
+      margin-bottom: 0.3rem;
+    }
+    .edu-school { font-size: 0.9rem; color: var(--accent2); margin-bottom: 0.8rem; }
+    .edu-details { font-size: 0.8rem; color: var(--muted); }
+
+    /* ── Contact ───────────────────────────────────────── */
+    #contact {
+      text-align: center;
+      padding: 8rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 100%, rgba(232,97,26,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .contact-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .contact-heading {
+      font-family: var(--font-head);
+      font-size: clamp(3rem, 7vw, 6rem);
+      letter-spacing: 0.03em;
+      margin-bottom: 1.5rem;
+    }
+    .contact-sub { font-size: 1rem; color: var(--muted); max-width: 45ch; margin: 0 auto 3rem; }
+    .contact-email {
+      font-family: var(--font-head);
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      display: inline-block;
+      margin-bottom: 3rem;
+      transition: color 0.2s;
+    }
+    .contact-email:hover { color: var(--accent2); }
+    .social-links {
+      display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .social-link {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.2rem;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .social-link:hover { color: var(--text); border-color: var(--text); }
+
+    /* ── Footer ────────────────────────────────────────── */
+    footer {
+      padding: 1.5rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    footer p {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    /* ── Scroll reveal ─────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ────────────────────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+      #hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 4rem; gap: 3rem; }
+      .hero-stats { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 2rem; flex-direction: row; flex-wrap: wrap; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      section { padding: 5rem 1.5rem; }
+      footer { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ──────────────────────────────────── -->
+  <nav>
+    <div class="nav-logo">YN.ENG — v1.0</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── Hero ────────────────────────────────────────── -->
+  <section id="hero">
+    <div class="hero-left">
+      <p class="hero-label">Mechanical Engineer — Portfolio</p>
+      <h1 class="hero-name">
+        Your<br><span>Name</span><br>Here
+      </h1>
+      <p class="hero-tagline">
+        Designing systems that move, endure, and perform — from concept sketch to manufactured part.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="resume.pdf" class="btn btn-outline" target="_blank">Download CV</a>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-number">0+</div><!-- Replace with real number -->
+        <div class="stat-label">Projects Completed</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">0+</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">0+</div>
+        <div class="stat-label">Tools & Software</div>
+      </div>
+      <div class="hero-availability">
+        <span class="dot"></span> Available for new opportunities
+      </div>
+    </div>
+
+    <div class="hero-bg-text" aria-hidden="true">MECH</div>
+  </section>
+
+  <!-- ── About ───────────────────────────────────────── -->
+  <section id="about">
+    <div class="section-header reveal">
+      <span class="section-num">01 //</span>
+      <h2 class="section-title">About Me</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-photo-frame reveal">
+        <!-- Replace contents with: <img src="your-photo.jpg" alt="Your Name" style="width:100%;height:100%;object-fit:cover;"> -->
+      </div>
+      <div class="about-text reveal">
+        <h3>Engineer by training,<br>problem-solver by nature.</h3>
+        <p>
+          Hi — I'm <strong>Your Name</strong>, a mechanical engineer based in <strong>Your City</strong>.
+          I specialize in <strong>design, analysis, and prototyping</strong> of mechanical systems, with
+          a passion for bridging the gap between concept and physical product.
+        </p>
+        <p>
+          My background spans <strong>thermal systems, structural analysis, and manufacturing processes</strong>.
+          I thrive in cross-functional environments where precision engineering meets creative problem-solving.
+        </p>
+        <p>
+          <!-- Add a personal sentence — what drives you, what you're working on, or what makes you different. -->
+          When I'm not at the workbench I enjoy [hobby/interest], which keeps my spatial reasoning sharp.
+        </p>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>Location</label>
+            <span>Your City, State</span>
+          </div>
+          <div class="detail-item">
+            <label>Degree</label>
+            <span>B.S. Mechanical Engineering</span>
+          </div>
+          <div class="detail-item">
+            <label>Specialization</label>
+            <span>Design & Manufacturing</span>
+          </div>
+          <div class="detail-item">
+            <label>Status</label>
+            <span>Open to Work</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Skills ──────────────────────────────────────── -->
+  <section id="skills">
+    <div class="section-header reveal">
+      <span class="section-num">02 //</span>
+      <h2 class="section-title">Skills & Tools</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="skills-grid reveal">
+      <div class="skill-category">
+        <div class="skill-cat-title">CAD / Design</div>
+        <span class="skill-tag">SolidWorks</span>
+        <span class="skill-tag">AutoCAD</span>
+        <span class="skill-tag">CATIA</span>
+        <span class="skill-tag">Fusion 360</span>
+        <span class="skill-tag">GD&T</span>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Analysis / Simulation</div>
+        <span class="skill-tag">FEA / ANSYS</span>
+        <span class="skill-tag">CFD</span>
+        <span class="skill-tag">MATLAB</span>
+        <span class="skill-tag">Thermal Analysis</span>
+        <span class="skill-tag">Fatigue Analysis</span>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Manufacturing</div>
+        <span class="skill-tag">CNC Machining</span>
+        <span class="skill-tag">3D Printing</span>
+        <span class="skill-tag">Sheet Metal</span>
+        <span class="skill-tag">Welding</span>
+        <span class="skill-tag">DFM / DFA</span>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-title">Other</div>
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">MS Office</span>
+        <span class="skill-tag">Project Mgmt</span>
+        <span class="skill-tag">Technical Writing</span>
+        <span class="skill-tag">Root Cause Analysis</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Projects ────────────────────────────────────── -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <span class="section-num">03 //</span>
+      <h2 class="section-title">Featured Projects</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-grid">
+
+      <!-- Project card 1 -->
+      <div class="project-card reveal">
+        <div class="project-img">
+          <div class="project-img-placeholder">Project Image</div>
+          <!-- Replace with: <img src="project1.jpg" alt="Project One"> -->
+          <span class="project-tag">Design</span>
+        </div>
+        <div class="project-body">
+          <h3 class="project-title">Project Title One</h3>
+          <p class="project-desc">
+            Brief description of the project. What was the problem? What did you design or build?
+            What was the outcome or key result? Keep it concise but specific.
+          </p>
+          <div class="project-meta">
+            <span>SolidWorks</span>
+            <span>FEA</span>
+            <span>2024</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project card 2 -->
+      <div class="project-card reveal">
+        <div class="project-img">
+          <div class="project-img-placeholder">Project Image</div>
+          <span class="project-tag">Analysis</span>
+        </div>
+        <div class="project-body">
+          <h3 class="project-title">Project Title Two</h3>
+          <p class="project-desc">
+            Brief description of the project. Highlight technical challenges overcome and
+            quantifiable results (e.g., "Reduced part weight by 18% while maintaining load capacity").
+          </p>
+          <div class="project-meta">
+            <span>ANSYS</span>
+            <span>MATLAB</span>
+            <span>2024</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project card 3 -->
+      <div class="project-card reveal">
+        <div class="project-img">
+          <div class="project-img-placeholder">Project Image</div>
+          <span class="project-tag">Prototype</span>
+        </div>
+        <div class="project-body">
+          <h3 class="project-title">Project Title Three</h3>
+          <p class="project-desc">
+            Another project. Senior capstone, personal build, competition entry, or internship
+            deliverable all work well here. Include your role if it was a team effort.
+          </p>
+          <div class="project-meta">
+            <span>3D Printing</span>
+            <span>CNC</span>
+            <span>2023</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Experience ───────────────────────────────────── -->
+  <section id="experience">
+    <div class="section-header reveal">
+      <span class="section-num">04 //</span>
+      <h2 class="section-title">Experience</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="timeline">
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">JAN 2024 — PRESENT</div>
+        <div class="timeline-role">Mechanical Engineer</div>
+        <div class="timeline-company">Company Name · City, State</div>
+        <p class="timeline-desc">
+          What do / did you do here? Focus on impact and scope. Use action verbs:
+          designed, analyzed, led, reduced, improved, developed. Quantify where possible.
+        </p>
+        <div class="timeline-skills">
+          <span class="skill-tag">SolidWorks</span>
+          <span class="skill-tag">DFM</span>
+          <span class="skill-tag">Vendor Management</span>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">MAY 2023 — DEC 2023</div>
+        <div class="timeline-role">Engineering Intern</div>
+        <div class="timeline-company">Company Name · City, State</div>
+        <p class="timeline-desc">
+          Internship responsibilities and achievements. Even short internships are valuable —
+          focus on what you learned and what you delivered.
+        </p>
+        <div class="timeline-skills">
+          <span class="skill-tag">AutoCAD</span>
+          <span class="skill-tag">ANSYS</span>
+          <span class="skill-tag">Technical Reports</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Education ────────────────────────────────────── -->
+  <section id="education">
+    <div class="section-header reveal">
+      <span class="section-num">05 //</span>
+      <h2 class="section-title">Education</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="edu-grid">
+
+      <div class="edu-card reveal">
+        <div class="edu-year">2020 — 2024</div>
+        <div class="edu-degree">B.S. Mechanical Engineering</div>
+        <div class="edu-school">University Name</div>
+        <div class="edu-details">
+          GPA: X.XX / 4.0<br>
+          Relevant coursework: Thermodynamics, Fluid Mechanics, Machine Design, FEA, Materials Science<br>
+          Honors / Clubs: [e.g., Dean's List, ASME Student Chapter, Formula SAE]
+        </div>
+      </div>
+
+      <div class="edu-card reveal">
+        <div class="edu-year">Certifications</div>
+        <div class="edu-degree">Professional Certs</div>
+        <div class="edu-school">Various Issuers</div>
+        <div class="edu-details">
+          · Certified SolidWorks Associate (CSWA)<br>
+          · OSHA 30-Hour Safety<br>
+          · [Any other relevant certifications]
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Contact ──────────────────────────────────────── -->
+  <section id="contact">
+    <div class="contact-bg"></div>
+    <p class="contact-eyebrow reveal">Let's build something</p>
+    <h2 class="contact-heading reveal">Get In Touch</h2>
+    <p class="contact-sub reveal">
+      Whether you have a role, a project, or just want to talk engineering —
+      my inbox is always open.
+    </p>
+    <a href="mailto:your@email.com" class="contact-email reveal">your@email.com</a>
+    <div class="social-links reveal">
+      <a href="https://linkedin.com/in/yourprofile" class="social-link" target="_blank">LinkedIn</a>
+      <a href="https://github.com/yourusername" class="social-link" target="_blank">GitHub</a>
+      <a href="resume.pdf" class="social-link" target="_blank">Resume PDF</a>
+      <!-- Add more as needed: ASME, personal blog, etc. -->
+    </div>
+  </section>
+
+  <!-- ── Footer ───────────────────────────────────────── -->
+  <footer>
+    <p>© 2025 Your Name — Mechanical Engineer</p>
+    <p>Built with HTML & CSS · No frameworks</p>
+  </footer>
+
+  <!-- ── Scroll reveal script ─────────────────────────── -->
+  <script>
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
 </html>
